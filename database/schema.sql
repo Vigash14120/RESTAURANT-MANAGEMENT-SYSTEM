@@ -89,13 +89,15 @@ CREATE TABLE reservation (
   table_number INT NOT NULL,
   reservation_time DATETIME NOT NULL,
   reservation_status_id BIGINT NOT NULL,
+  party_size INT NOT NULL DEFAULT 1,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_reservation_floor_table
     FOREIGN KEY (table_number) REFERENCES floor_table(table_number)
     ON UPDATE CASCADE ON DELETE RESTRICT,
   CONSTRAINT fk_reservation_status
     FOREIGN KEY (reservation_status_id) REFERENCES reservation_status(reservation_status_id)
-    ON UPDATE CASCADE ON DELETE RESTRICT
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT chk_reservation_party_size CHECK (party_size > 0)
 ) ENGINE=InnoDB;
 
 CREATE TABLE table_assignment (

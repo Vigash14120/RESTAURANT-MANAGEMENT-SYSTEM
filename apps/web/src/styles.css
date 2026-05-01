@@ -87,3 +87,168 @@ body {
 .page-card h2 {
   margin-top: 0;
 }
+
+.page-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.filters-row {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-bottom: 14px;
+}
+
+.form-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  align-items: end;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field span {
+  font-size: 13px;
+  color: #334155;
+}
+
+.field input,
+.field select {
+  padding: 9px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+button {
+  padding: 9px 12px;
+  border: 1px solid #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:disabled {
+  background: #94a3b8;
+  border-color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th,
+td {
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 10px 8px;
+}
+
+thead th {
+  color: #334155;
+  font-size: 13px;
+}
+
+.selected-row {
+  background: #eff6ff;
+}
+
+.status-chip {
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 12px;
+  text-transform: capitalize;
+  border: 1px solid transparent;
+}
+
+.status-chip.available {
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+.status-chip.reserved,
+.status-chip.confirmed {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+.status-chip.pending {
+  background: #fef3c7;
+  border-color: #fcd34d;
+}
+
+.status-chip.cancelled {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.status-chip.completed {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+.state-text {
+  margin-top: 12px;
+  color: #334155;
+}
+
+.state-text.error {
+  color: #b91c1c;
+}
+
+.action-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.muted-text {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.kpi-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.kpi-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.kpi-card h3 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #475569;
+}
+
+.kpi-card p {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.dashboard-two-col {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+}

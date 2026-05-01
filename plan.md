@@ -24,3 +24,7 @@ Build the Restaurant Management System from the constitution using React + TypeS
 - Module 1 foundation and scaffolding is completed.
 - Module 2 plan is saved at `plans/module-2-database-schema-migrations.md`.
 - Module 2 migrations/schema are implemented; migration execution is blocked until valid local MySQL credentials are provided.
+- Module 3 plan is saved at `plans/module-3-floor-reservation-domain.md`.
+- Module 3 API/UI implementation is complete; final integration run is blocked until database credentials are configured.
+- Module 4 plan is saved at `plans/module-4-orders-kitchen-service.md`.
+- Module 6 frontend shell/dashboard implementation is complete, including staff/menu/dashboard APIs and fully wired Dashboard + Staffing pages.
