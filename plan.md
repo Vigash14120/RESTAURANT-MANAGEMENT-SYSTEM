@@ -23,3 +23,4 @@ Build the Restaurant Management System from the constitution using React + TypeS
 - Detailed module plans are stored in `plans/`.
 - Module 1 foundation and scaffolding is completed.
 - Module 2 plan is saved at `plans/module-2-database-schema-migrations.md`.
+- Module 2 migrations/schema are implemented; migration execution is blocked until valid local MySQL credentials are provided.

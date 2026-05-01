@@ -1,0 +1,11 @@
+CREATE INDEX idx_staff_shift_log_shift_time ON staff_shift_log (shift_time);
+CREATE INDEX idx_floor_table_location ON floor_table (location);
+CREATE INDEX idx_reservation_time_status ON reservation (reservation_time, reservation_status_id);
+CREATE INDEX idx_table_assignment_table_reservation ON table_assignment (table_number, reservation_id);
+CREATE INDEX idx_dish_category ON dish (category_id, item_name);
+CREATE INDEX idx_kitchen_ticket_dispatch ON kitchen_ticket_log (dispatch_time);
+CREATE INDEX idx_customer_order_created ON customer_order (time_created);
+CREATE INDEX idx_emergency_request_time ON emergency_request (order_time);
+CREATE INDEX idx_kitchen_order_created ON kitchen_order (created_at);
+CREATE INDEX idx_service_order_created ON service_order (created_at);
+CREATE INDEX idx_ingredient_stock_level ON ingredient_stock (stock_level);
