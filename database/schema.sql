@@ -1,0 +1,2 @@
+-- Canonical schema is defined in CONSTITUTION.md section "Canonical Entity Implementation".
+-- Module 2 will formalize this into executable migration files under database/migrations.
