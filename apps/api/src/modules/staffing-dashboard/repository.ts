@@ -394,16 +394,16 @@ export async function getStaffShiftLogById(shiftLogId: number): Promise<StaffShi
   const [rows] = await pool.query<StaffShiftLogRow[]>(
     `
       SELECT
-        ssl.shift_log_id,
-        ssl.staff_id,
+        slog.shift_log_id,
+        slog.staff_id,
         s.first_name AS staff_first_name,
         s.last_name AS staff_last_name,
-        ssl.shift_time,
-        ssl.created_at
-      FROM staff_shift_log ssl
+        slog.shift_time,
+        slog.created_at
+      FROM staff_shift_log slog
       JOIN staff s
-        ON s.staff_id = ssl.staff_id
-      WHERE ssl.shift_log_id = ?
+        ON s.staff_id = slog.staff_id
+      WHERE slog.shift_log_id = ?
       LIMIT 1
     `,
     [shiftLogId]
@@ -416,16 +416,16 @@ export async function listStaffShiftLogs(limit = 25): Promise<StaffShiftLogDto[]
   const [rows] = await pool.query<StaffShiftLogRow[]>(
     `
       SELECT
-        ssl.shift_log_id,
-        ssl.staff_id,
+        slog.shift_log_id,
+        slog.staff_id,
         s.first_name AS staff_first_name,
         s.last_name AS staff_last_name,
-        ssl.shift_time,
-        ssl.created_at
-      FROM staff_shift_log ssl
+        slog.shift_time,
+        slog.created_at
+      FROM staff_shift_log slog
       JOIN staff s
-        ON s.staff_id = ssl.staff_id
-      ORDER BY ssl.shift_time DESC
+        ON s.staff_id = slog.staff_id
+      ORDER BY slog.shift_time DESC
       LIMIT ?
     `,
     [limit]
@@ -885,16 +885,16 @@ export async function listDashboardUpcomingShifts(limit = 5): Promise<StaffShift
   const [rows] = await pool.query<StaffShiftLogRow[]>(
     `
       SELECT
-        ssl.shift_log_id,
-        ssl.staff_id,
+        slog.shift_log_id,
+        slog.staff_id,
         s.first_name AS staff_first_name,
         s.last_name AS staff_last_name,
-        ssl.shift_time,
-        ssl.created_at
-      FROM staff_shift_log ssl
+        slog.shift_time,
+        slog.created_at
+      FROM staff_shift_log slog
       JOIN staff s
-        ON s.staff_id = ssl.staff_id
-      ORDER BY ABS(TIMESTAMPDIFF(SECOND, ssl.shift_time, NOW())) ASC, ssl.shift_time ASC
+        ON s.staff_id = slog.staff_id
+      ORDER BY ABS(TIMESTAMPDIFF(SECOND, slog.shift_time, NOW())) ASC, slog.shift_time ASC
       LIMIT ?
     `,
     [limit]

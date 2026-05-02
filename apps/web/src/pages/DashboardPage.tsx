@@ -12,9 +12,10 @@ export function DashboardPage() {
   const [summary, setSummary] = useState<DashboardSummaryDto | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
-  const refresh = async () => {
-    setLoading(true);
+  const refresh = async (isAuto = false) => {
+    if (!isAuto) setLoading(true);
     setError(null);
     try {
       const response = await fetchApi<DashboardSummaryDto>("/dashboard/summary");
@@ -22,101 +23,116 @@ export function DashboardPage() {
         throw new Error(response.error.message);
       }
       setSummary(response.data);
+      setLastUpdated(new Date());
     } catch (unknownError) {
       setError(errorMessage(unknownError, "Failed to load dashboard summary."));
     } finally {
-      setLoading(false);
+      if (!isAuto) setLoading(false);
     }
   };
 
   useEffect(() => {
     void refresh();
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      void refresh(true);
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="page-stack">
+    <div className="page-stack fade-in">
       <div className="page-card">
-        <div className="action-row">
-          <h2>Dashboard</h2>
-          <button type="button" onClick={() => void refresh()} disabled={loading}>
-            Refresh
-          </button>
+        <div className="action-row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <h2 style={{ margin: 0 }}>Dashboard</h2>
+            <div className="live-indicator">
+              <span className="pulse-dot"></span>
+              LIVE
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <span className="muted-text">Updated: {lastUpdated.toLocaleTimeString()}</span>
+            <button type="button" onClick={() => void refresh()} disabled={loading}>
+              {loading ? "Refreshed" : "Refresh Now"}
+            </button>
+          </div>
         </div>
         <p className="muted-text">Cross-module health view for reservations, orders, inventory, and staffing.</p>
         {error ? <p className="state-text error">{error}</p> : null}
-        {loading ? <p className="state-text">Refreshing dashboard...</p> : null}
       </div>
 
       {summary ? (
         <>
           <div className="kpi-grid">
-            <article className="kpi-card">
-              <h3>Active Reservations</h3>
+            <article className="kpi-card success">
+              <h3>📅 Active Reservations</h3>
               <p>{summary.kpis.activeReservations}</p>
+              <div className="capacity-bar-bg">
+                <div 
+                  className={`capacity-bar-fill ${summary.kpis.activeReservations > 10 ? 'warning' : ''}`} 
+                  style={{ width: `${Math.min((summary.kpis.activeReservations / 20) * 100, 100)}%` }}
+                ></div>
+              </div>
             </article>
-            <article className="kpi-card">
-              <h3>Total Reservations</h3>
-              <p>{summary.kpis.totalReservations}</p>
-            </article>
-            <article className="kpi-card">
-              <h3>Total Tickets</h3>
+            <article className="kpi-card primary">
+              <h3>🎟️ Total Tickets</h3>
               <p>{summary.kpis.totalTickets}</p>
             </article>
-            <article className="kpi-card">
-              <h3>Kitchen Queue</h3>
+            <article className="kpi-card warning">
+              <h3>🍳 Kitchen Queue</h3>
               <p>{summary.kpis.kitchenQueue}</p>
             </article>
-            <article className="kpi-card">
-              <h3>Service Queue</h3>
+            <article className="kpi-card info">
+              <h3>🍽️ Service Queue</h3>
               <p>{summary.kpis.serviceQueue}</p>
             </article>
-            <article className="kpi-card">
-              <h3>Emergency Requests</h3>
+            <article className="kpi-card danger">
+              <h3>🚨 Emergency</h3>
               <p>{summary.kpis.emergencyRequests}</p>
             </article>
-            <article className="kpi-card">
-              <h3>Low Stock Items</h3>
+            <article className="kpi-card danger">
+              <h3>📦 Low Stock</h3>
               <p>{summary.kpis.lowStockItems}</p>
             </article>
-            <article className="kpi-card">
-              <h3>Total Suppliers</h3>
-              <p>{summary.kpis.totalSuppliers}</p>
-            </article>
-            <article className="kpi-card">
-              <h3>Total Staff</h3>
+            <article className="kpi-card staff">
+              <h3>👥 Total Staff</h3>
               <p>{summary.kpis.totalStaff}</p>
             </article>
-            <article className="kpi-card">
-              <h3>Staff Members</h3>
-              <p>{summary.kpis.totalStaffMembers}</p>
-            </article>
-            <article className="kpi-card">
-              <h3>Job Assignments</h3>
+            <article className="kpi-card staff">
+              <h3>📋 Assignments</h3>
               <p>{summary.kpis.totalJobAssignments}</p>
             </article>
           </div>
 
           <div className="dashboard-two-col">
             <div className="page-card">
-              <h3>Low Stock Watch</h3>
+              <div className="dashboard-section-title">
+                <h3>📦 Low Stock Watch</h3>
+                <span className="status-chip danger">{summary.lowStockIngredients.length} Items</span>
+              </div>
               <div className="table-container">
                 <table>
                   <thead>
                     <tr>
-                      <th>Ingredient</th>
-                      <th>Stock Level</th>
+                      <th>Ingredient ID</th>
+                      <th>Level</th>
+                      <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {summary.lowStockIngredients.length === 0 ? (
                       <tr>
-                        <td colSpan={2}>No ingredients below threshold.</td>
+                        <td colSpan={3}>No ingredients below threshold.</td>
                       </tr>
                     ) : (
                       summary.lowStockIngredients.map((item) => (
                         <tr key={item.ingredientId}>
-                          <td>{item.ingredientId}</td>
+                          <td><strong>#{item.ingredientId}</strong></td>
                           <td>{item.stockLevel.toFixed(2)}</td>
+                          <td><span className="status-chip danger">Critical</span></td>
                         </tr>
                       ))
                     )}
@@ -126,29 +142,29 @@ export function DashboardPage() {
             </div>
 
             <div className="page-card">
-              <h3>Upcoming Shifts</h3>
+              <div className="dashboard-section-title">
+                <h3>🗓️ Upcoming Shifts</h3>
+              </div>
               <div className="table-container">
                 <table>
                   <thead>
                     <tr>
-                      <th>Shift</th>
                       <th>Staff</th>
-                      <th>Time</th>
+                      <th>Shift Time</th>
                     </tr>
                   </thead>
                   <tbody>
                     {summary.upcomingShifts.length === 0 ? (
                       <tr>
-                        <td colSpan={3}>No shift logs yet.</td>
+                        <td colSpan={2}>No shift logs yet.</td>
                       </tr>
                     ) : (
                       summary.upcomingShifts.map((shift) => (
                         <tr key={shift.shiftLogId}>
-                          <td>{shift.shiftLogId}</td>
                           <td>
-                            {shift.staffFirstName} {shift.staffLastName}
+                            <strong>{shift.staffFirstName} {shift.staffLastName}</strong>
                           </td>
-                          <td>{new Date(shift.shiftTime).toLocaleString()}</td>
+                          <td>{new Date(shift.shiftTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                         </tr>
                       ))
                     )}
@@ -160,12 +176,14 @@ export function DashboardPage() {
 
           <div className="dashboard-two-col">
             <div className="page-card">
-              <h3>Latest Reservations</h3>
+              <div className="dashboard-section-title">
+                <h3>✅ Latest Reservations</h3>
+              </div>
               <div className="table-container">
                 <table>
                   <thead>
                     <tr>
-                      <th>Reservation</th>
+                      <th>ID</th>
                       <th>Table</th>
                       <th>Status</th>
                     </tr>
@@ -176,11 +194,15 @@ export function DashboardPage() {
                         <td colSpan={3}>No reservations found.</td>
                       </tr>
                     ) : (
-                      summary.latestReservations.map((reservation) => (
-                        <tr key={reservation.reservationId}>
-                          <td>{reservation.reservationId}</td>
-                          <td>{reservation.tableNumber}</td>
-                          <td>{reservation.status}</td>
+                      summary.latestReservations.map((res) => (
+                        <tr key={res.reservationId}>
+                          <td>#{res.reservationId}</td>
+                          <td>Table {res.tableNumber}</td>
+                          <td>
+                            <span className={`status-chip ${res.status}`}>
+                              {res.status}
+                            </span>
+                          </td>
                         </tr>
                       ))
                     )}
@@ -190,14 +212,16 @@ export function DashboardPage() {
             </div>
 
             <div className="page-card">
-              <h3>Latest Tickets</h3>
+              <div className="dashboard-section-title">
+                <h3>🎫 Recent Tickets</h3>
+              </div>
               <div className="table-container">
                 <table>
                   <thead>
                     <tr>
-                      <th>Ticket</th>
-                      <th>Order</th>
-                      <th>Party Size</th>
+                      <th>Ticket ID</th>
+                      <th>Party</th>
+                      <th>Time</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -208,9 +232,9 @@ export function DashboardPage() {
                     ) : (
                       summary.latestTickets.map((ticket) => (
                         <tr key={ticket.ticketId}>
-                          <td>{ticket.ticketId}</td>
-                          <td>{ticket.customerOrderId}</td>
-                          <td>{ticket.partySize}</td>
+                          <td><strong>#{ticket.ticketId}</strong></td>
+                          <td>{ticket.partySize} People</td>
+                          <td>{new Date(ticket.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                         </tr>
                       ))
                     )}
@@ -221,13 +245,15 @@ export function DashboardPage() {
           </div>
 
           <div className="page-card">
-            <h3>Maintenance Logs</h3>
+            <div className="dashboard-section-title">
+              <h3>🔧 System Maintenance Logs</h3>
+            </div>
             <div className="table-container">
               <table>
                 <thead>
                   <tr>
-                    <th>Log</th>
                     <th>Supplier</th>
+                    <th>Date</th>
                     <th>Details</th>
                   </tr>
                 </thead>
@@ -239,8 +265,8 @@ export function DashboardPage() {
                   ) : (
                     summary.latestMaintenanceLogs.map((log) => (
                       <tr key={log.maintenanceLogId}>
-                        <td>{log.maintenanceLogId}</td>
-                        <td>{log.companyName}</td>
+                        <td><strong>{log.companyName}</strong></td>
+                        <td>{new Date(log.loggedAt).toLocaleDateString()}</td>
                         <td>{log.details ?? "-"}</td>
                       </tr>
                     ))
@@ -254,3 +280,4 @@ export function DashboardPage() {
     </div>
   );
 }
+
